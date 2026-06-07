@@ -1,0 +1,15 @@
+{
+  "tag": "fast",
+  "topic": "betting-odds",
+  "bootstrap_servers": "localhost:9092",
+  "speed": 0.0,
+  "producer_limit": 10000,
+  "producer_warmup": 5.0,
+  "batch_window": 10.0,
+  "stream_trigger_ms": 200,
+  "drain_seconds": 25.0,
+  "results_dir": "/Users/xristos/Learning/ionio/\u03c0\u03bb\u03b1\u03c4\u03c6\u03bf\u03c1\u03bc\u03b5\u03c2 \u03ba\u03b1\u03b9 \u03b1\u03c1\u03c7\u03b9\u03c4\u03b5\u03ba\u03c4\u03bf\u03bd\u03b9\u03ba\u03b5\u03c2 \u03bd\u03b5\u03c6\u03bf\u03c5\u03c2/arbitrage-streaming/benchmarks/results",
+  "logs_dir": "/Users/xristos/Learning/ionio/\u03c0\u03bb\u03b1\u03c4\u03c6\u03bf\u03c1\u03bc\u03b5\u03c2 \u03ba\u03b1\u03b9 \u03b1\u03c1\u03c7\u03b9\u03c4\u03b5\u03ba\u03c4\u03bf\u03bd\u03b9\u03ba\u03b5\u03c2 \u03bd\u03b5\u03c6\u03bf\u03c5\u03c2/arbitrage-streaming/benchmarks/logs",
+  "log_level": "INFO",
+  "timestamp": 1779492017146
+}

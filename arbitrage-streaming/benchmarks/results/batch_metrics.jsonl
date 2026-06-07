@@ -1,0 +1,10 @@
+{"batch": 1, "rows_read": 0, "opps_found": 0, "processing_ms": 379, "wall_time_ms": 1780790220915}
+{"batch": 2, "rows_read": 0, "opps_found": 0, "processing_ms": 322, "wall_time_ms": 1780790228864}
+{"batch": 3, "rows_read": 0, "opps_found": 0, "processing_ms": 317, "wall_time_ms": 1780790236861}
+{"batch": 4, "rows_read": 0, "opps_found": 0, "processing_ms": 313, "wall_time_ms": 1780790244860}
+{"batch": 5, "rows_read": 5000, "opps_found": 7, "processing_ms": 3534, "wall_time_ms": 1780790256086}
+{"batch": 6, "rows_read": 0, "opps_found": 0, "processing_ms": 318, "wall_time_ms": 1780790260875}
+{"batch": 7, "rows_read": 0, "opps_found": 0, "processing_ms": 319, "wall_time_ms": 1780790268882}
+{"batch": 8, "rows_read": 0, "opps_found": 0, "processing_ms": 314, "wall_time_ms": 1780790276877}
+{"batch": 9, "rows_read": 0, "opps_found": 0, "processing_ms": 313, "wall_time_ms": 1780790284881}
+{"batch": 10, "rows_read": 0, "opps_found": 0, "processing_ms": 317, "wall_time_ms": 1780790292887}

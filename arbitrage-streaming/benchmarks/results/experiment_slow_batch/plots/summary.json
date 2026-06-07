@@ -1,0 +1,28 @@
+[
+  {
+    "label": "Batch (\u039c\u03ad\u03b8\u03bf\u03b4\u03bf\u03c2 \u0391)",
+    "batches": 2,
+    "events": 10000,
+    "opps": 9,
+    "proc_ms_p50": 2022.0,
+    "proc_ms_p95": 3503.3999999999996,
+    "proc_ms_p99": 3635.08,
+    "lat_ms_p50": 29872.0,
+    "lat_ms_p95": 29957.8,
+    "lat_ms_p99": 29977.96,
+    "throughput_ev_s": 300.3183374376839
+  },
+  {
+    "label": "Stream (\u039c\u03ad\u03b8\u03bf\u03b4\u03bf\u03c2 \u0392)",
+    "batches": 3,
+    "events": 10000,
+    "opps": 9,
+    "proc_ms_p50": 532.0,
+    "proc_ms_p95": 723.6999999999999,
+    "proc_ms_p99": 740.74,
+    "lat_ms_p50": 1566.0,
+    "lat_ms_p95": 1617.8,
+    "lat_ms_p99": 1618.76,
+    "throughput_ev_s": 2395.7834211787253
+  }
+]

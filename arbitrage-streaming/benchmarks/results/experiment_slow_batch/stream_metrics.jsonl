@@ -1,0 +1,3 @@
+{"batch": 1, "spark_batch_id": 0, "rows_read": 0, "touched_matches": 0, "opps_found": 0, "processing_ms": 68, "wall_time_ms": 1779492083451}
+{"batch": 2, "spark_batch_id": 1, "rows_read": 896, "touched_matches": 226, "opps_found": 1, "processing_ms": 532, "wall_time_ms": 1779492086797}
+{"batch": 3, "spark_batch_id": 2, "rows_read": 9104, "touched_matches": 2279, "opps_found": 8, "processing_ms": 745, "wall_time_ms": 1779492087625}

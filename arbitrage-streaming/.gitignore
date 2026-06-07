@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Data (μεγάλα αρχεία — δεν committed)
+data/*.csv
+data/*.zip
+data/*.parquet
+data/raw/
+data/processed/
+!data/README.md
+!data/.gitkeep
+
+# Spark
+*.crc
+metastore_db/
+spark-warehouse/
+derby.log
+
+# Kafka logs
+kafka-logs/
+
+# Benchmarks raw output
+benchmarks/results/*.json
+benchmarks/results/*.csv
+!benchmarks/results/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

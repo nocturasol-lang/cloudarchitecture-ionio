@@ -1,0 +1,28 @@
+flowchart TD
+    CSV[("data/raw/*.csv<br/>14.802 αγώνες × 6 bookmakers<br/>8 λίγκες × 5 σεζόν")]
+    PROD["<b>PRODUCER</b> — producer.py<br/>Replay των CSV ως OddsUpdate events<br/>σε χρονολογική σειρά"]
+    KAFKA["<b>Apache Kafka</b><br/>Topic: betting-odds (3 partitions)<br/>KRaft mode (χωρίς Zookeeper)"]
+    BATCH["<b>BATCH CONSUMER</b><br/>Spark batch read<br/>κάθε N δευτερόλεπτα"]
+    STREAM["<b>STREAM CONSUMER</b><br/>Spark Structured Streaming<br/>trigger 200 ms"]
+    DET["detect_arbitrage()<br/>κοινή λογική ανίχνευσης"]
+    BOUT[("batch_opps.jsonl<br/>+ batch_metrics.jsonl")]
+    SOUT[("stream_opps.jsonl<br/>+ stream_metrics.jsonl")]
+
+    CSV --> PROD
+    PROD -->|"JSON events<br/>key = match_id"| KAFKA
+    KAFKA --> BATCH
+    KAFKA --> STREAM
+    BATCH --> BOUT
+    BATCH -.-> DET
+    STREAM -.-> DET
+    STREAM --> SOUT
+
+    classDef store fill:#f7f7f7,stroke:#0a0a0a,stroke-width:1px,color:#2a2a2a
+    classDef proc fill:#ffffff,stroke:#0a0a0a,stroke-width:1.5px,color:#0a0a0a
+    classDef broker fill:#0a0a0a,stroke:#0a0a0a,color:#ffffff
+    classDef shared fill:#ffffff,stroke:#737373,stroke-width:1px,stroke-dasharray:4 3,color:#404040
+
+    class CSV,BOUT,SOUT store
+    class PROD,BATCH,STREAM proc
+    class KAFKA broker
+    class DET shared

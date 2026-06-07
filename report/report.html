@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>Arbitrage Streaming Detection — Εξαμηνιαία Εργασία</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --ink-2: #404040;
+    --ink-3: #737373;
+    --ink-4: #a3a3a3;
+    --line: #e5e5e5;
+    --line-soft: #f0f0f0;
+    --bg: #fafafa;
+    --paper: #ffffff;
+    --code-bg: #f7f7f7;
+    --code-ink: #2a2a2a;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink-2);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ── Cover page ────────────────────────────────────── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 100px 64px 64px;
+    max-width: 720px;
+    margin: 0 auto;
+    page-break-after: always;
+  }
+  .cover-top { text-align: left; }
+  .cover .uni {
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+  }
+  .cover .department {
+    font-size: 13px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 60px;
+  }
+  .cover .course {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink-2);
+    margin-bottom: 14px;
+  }
+  .cover h1 {
+    font-size: 2.4em;
+    line-height: 1.18;
+    color: var(--ink);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 24px;
+  }
+  .cover .tagline {
+    font-size: 1.05em;
+    color: var(--ink-2);
+    max-width: 540px;
+    margin: 0;
+  }
+  .cover-bottom {
+    border-top: 1px solid var(--line);
+    padding-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 40px;
+  }
+  .cover-bottom .field-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+  }
+  .cover-bottom .field-value {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ── Main content ──────────────────────────────────── */
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 32px 80px;
+  }
+  section { margin-bottom: 56px; }
+  h2 {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  h2 .num {
+    display: inline-block;
+    width: 1.8em;
+    color: var(--ink-4);
+    font-weight: 500;
+  }
+  .section-rule {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 0 0 28px;
+  }
+  h3 {
+    font-size: 1.04em;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 32px 0 8px;
+  }
+  p { margin: 0.7em 0; text-align: justify; }
+  a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--ink-4);
+    text-underline-offset: 3px;
+  }
+  a:hover { text-decoration-color: var(--ink); }
+  ul, ol { padding-left: 1.4em; margin: 0.6em 0; }
+  li { margin: 0.25em 0; }
+  strong { color: var(--ink); font-weight: 600; }
+  em { color: var(--ink-2); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86em;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 16px 18px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.82em;
+    line-height: 1.55;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 1em 0;
+    border: 1px solid var(--line);
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+  }
+
+
+  /* VS Code dark theme for the 5.6 comparison blocks */
+  .code-compare .code-label {
+    background: #2d2d2d;
+    color: #ffffff;
+    border-top: 2px solid #007acc;
+    border-radius: 6px 6px 0 0;
+    padding: 7px 12px;
+    margin-bottom: 0;
+    letter-spacing: 0.05em;
+  }
+  .code-compare pre.vsdark {
+    background: #1e1e1e;
+    color: #abb2bf;
+    border: none;
+    border-radius: 0 0 6px 6px;
+    margin-top: 0;
+  }
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.code-compare pre.vsdark .hll { background-color: #ffffcc }
+.code-compare pre.vsdark { background: #282C34; color: #ABB2BF }
+.code-compare pre.vsdark .c { color: #7F848E } /* Comment */
+.code-compare pre.vsdark .err { color: #ABB2BF } /* Error */
+.code-compare pre.vsdark .esc { color: #ABB2BF } /* Escape */
+.code-compare pre.vsdark .g { color: #ABB2BF } /* Generic */
+.code-compare pre.vsdark .k { color: #C678DD } /* Keyword */
+.code-compare pre.vsdark .l { color: #ABB2BF } /* Literal */
+.code-compare pre.vsdark .n { color: #E06C75 } /* Name */
+.code-compare pre.vsdark .o { color: #56B6C2 } /* Operator */
+.code-compare pre.vsdark .x { color: #ABB2BF } /* Other */
+.code-compare pre.vsdark .p { color: #ABB2BF } /* Punctuation */
+.code-compare pre.vsdark .ch { color: #7F848E } /* Comment.Hashbang */
+.code-compare pre.vsdark .cm { color: #7F848E } /* Comment.Multiline */
+.code-compare pre.vsdark .cp { color: #7F848E } /* Comment.Preproc */
+.code-compare pre.vsdark .cpf { color: #7F848E } /* Comment.PreprocFile */
+.code-compare pre.vsdark .c1 { color: #7F848E } /* Comment.Single */
+.code-compare pre.vsdark .cs { color: #7F848E } /* Comment.Special */
+.code-compare pre.vsdark .gd { color: #E06C75 } /* Generic.Deleted */
+.code-compare pre.vsdark .ge { color: #ABB2BF; font-style: italic } /* Generic.Emph */
+.code-compare pre.vsdark .ges { color: #ABB2BF } /* Generic.EmphStrong */
+.code-compare pre.vsdark .gr { color: #E06C75 } /* Generic.Error */
+.code-compare pre.vsdark .gh { color: #ABB2BF; font-weight: bold } /* Generic.Heading */
+.code-compare pre.vsdark .gi { color: #98C379 } /* Generic.Inserted */
+.code-compare pre.vsdark .go { color: #E06C75 } /* Generic.Output */
+.code-compare pre.vsdark .gp { color: #ABB2BF } /* Generic.Prompt */
+.code-compare pre.vsdark .gs { color: #ABB2BF; font-weight: bold } /* Generic.Strong */
+.code-compare pre.vsdark .gu { color: #ABB2BF; font-weight: bold } /* Generic.Subheading */
+.code-compare pre.vsdark .gt { color: #E06C75 } /* Generic.Traceback */
+.code-compare pre.vsdark .kc { color: #E5C07B } /* Keyword.Constant */
+.code-compare pre.vsdark .kd { color: #C678DD } /* Keyword.Declaration */
+.code-compare pre.vsdark .kn { color: #C678DD } /* Keyword.Namespace */
+.code-compare pre.vsdark .kp { color: #C678DD } /* Keyword.Pseudo */
+.code-compare pre.vsdark .kr { color: #C678DD } /* Keyword.Reserved */
+.code-compare pre.vsdark .kt { color: #E5C07B } /* Keyword.Type */
+.code-compare pre.vsdark .ld { color: #ABB2BF } /* Literal.Date */
+.code-compare pre.vsdark .m { color: #D19A66 } /* Literal.Number */
+.code-compare pre.vsdark .s { color: #98C379 } /* Literal.String */
+.code-compare pre.vsdark .na { color: #E06C75 } /* Name.Attribute */
+.code-compare pre.vsdark .nb { color: #E5C07B } /* Name.Builtin */
+.code-compare pre.vsdark .nc { color: #E5C07B } /* Name.Class */
+.code-compare pre.vsdark .no { color: #E06C75 } /* Name.Constant */
+.code-compare pre.vsdark .nd { color: #61AFEF } /* Name.Decorator */
+.code-compare pre.vsdark .ni { color: #E06C75 } /* Name.Entity */
+.code-compare pre.vsdark .ne { color: #E06C75 } /* Name.Exception */
+.code-compare pre.vsdark .nf { color: #61AFEF; font-weight: bold } /* Name.Function */
+.code-compare pre.vsdark .nl { color: #E06C75 } /* Name.Label */
+.code-compare pre.vsdark .nn { color: #E06C75 } /* Name.Namespace */
+.code-compare pre.vsdark .nx { color: #E06C75 } /* Name.Other */
+.code-compare pre.vsdark .py { color: #E06C75 } /* Name.Property */
+.code-compare pre.vsdark .nt { color: #E06C75 } /* Name.Tag */
+.code-compare pre.vsdark .nv { color: #E06C75 } /* Name.Variable */
+.code-compare pre.vsdark .ow { color: #56B6C2 } /* Operator.Word */
+.code-compare pre.vsdark .pm { color: #ABB2BF } /* Punctuation.Marker */
+.code-compare pre.vsdark .w { color: #ABB2BF } /* Text.Whitespace */
+.code-compare pre.vsdark .mb { color: #D19A66 } /* Literal.Number.Bin */
+.code-compare pre.vsdark .mf { color: #D19A66 } /* Literal.Number.Float */
+.code-compare pre.vsdark .mh { color: #D19A66 } /* Literal.Number.Hex */
+.code-compare pre.vsdark .mi { color: #D19A66 } /* Literal.Number.Integer */
+.code-compare pre.vsdark .mo { color: #D19A66 } /* Literal.Number.Oct */
+.code-compare pre.vsdark .sa { color: #98C379 } /* Literal.String.Affix */
+.code-compare pre.vsdark .sb { color: #98C379 } /* Literal.String.Backtick */
+.code-compare pre.vsdark .sc { color: #98C379 } /* Literal.String.Char */
+.code-compare pre.vsdark .dl { color: #98C379 } /* Literal.String.Delimiter */
+.code-compare pre.vsdark .sd { color: #98C379 } /* Literal.String.Doc */
+.code-compare pre.vsdark .s2 { color: #98C379 } /* Literal.String.Double */
+.code-compare pre.vsdark .se { color: #98C379 } /* Literal.String.Escape */
+.code-compare pre.vsdark .sh { color: #98C379 } /* Literal.String.Heredoc */
+.code-compare pre.vsdark .si { color: #98C379 } /* Literal.String.Interpol */
+.code-compare pre.vsdark .sx { color: #98C379 } /* Literal.String.Other */
+.code-compare pre.vsdark .sr { color: #98C379 } /* Literal.String.Regex */
+.code-compare pre.vsdark .s1 { color: #98C379 } /* Literal.String.Single */
+.code-compare pre.vsdark .ss { color: #98C379 } /* Literal.String.Symbol */
+.code-compare pre.vsdark .bp { color: #E5C07B } /* Name.Builtin.Pseudo */
+.code-compare pre.vsdark .fm { color: #56B6C2; font-weight: bold } /* Name.Function.Magic */
+.code-compare pre.vsdark .vc { color: #E06C75 } /* Name.Variable.Class */
+.code-compare pre.vsdark .vg { color: #E06C75 } /* Name.Variable.Global */
+.code-compare pre.vsdark .vi { color: #E06C75 } /* Name.Variable.Instance */
+.code-compare pre.vsdark .vm { color: #E06C75 } /* Name.Variable.Magic */
+.code-compare pre.vsdark .il { color: #D19A66 } /* Literal.Number.Integer.Long */
+
+  /* ── Side-by-side code comparison ──────────────────── */
+  .code-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 1.2em 0;
+  }
+  @media (max-width: 700px) {
+    .code-compare { grid-template-columns: 1fr; }
+  }
+  .code-col { min-width: 0; display: flex; flex-direction: column; }
+  .code-col .code-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+  .code-col pre {
+    margin: 0;
+    font-size: 0.72em;
+    flex: 1;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.92em;
+  }
+  th {
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1.5px solid var(--ink);
+    color: var(--ink);
+    font-size: 0.92em;
+  }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--ink-2);
+  }
+  tr:last-child td { border-bottom: 1px solid var(--line); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .callout {
+    border-left: 2px solid var(--ink);
+    padding: 4px 0 4px 18px;
+    margin: 1.2em 0;
+  }
+  .callout-title {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 0.92em;
+    margin-bottom: 4px;
+  }
+  .callout p { margin: 0.3em 0; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0;
+    margin: 1.5em 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .stat {
+    padding: 18px 8px;
+    text-align: center;
+    border-left: 1px solid var(--line-soft);
+  }
+  .stat:first-child { border-left: none; }
+  .stat .num {
+    font-size: 1.5em;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .label {
+    font-size: 0.72em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+  }
+
+  figure {
+    margin: 1.6em 0;
+    text-align: center;
+  }
+  figure img {
+    max-width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: white;
+  }
+  figcaption {
+    font-size: 0.84em;
+    color: var(--ink-3);
+    margin-top: 10px;
+    text-align: left;
+  }
+  figcaption .label {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .arch-diagram {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    padding: 18px 20px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 1em 0;
+  }
+
+  .toc {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 22px;
+    margin-bottom: 48px;
+    background: var(--paper);
+  }
+  .toc-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    margin: 0 0 10px;
+  }
+  .toc ol {
+    margin: 0;
+    padding-left: 1.4em;
+    columns: 2;
+    column-gap: 28px;
+    font-size: 0.92em;
+  }
+  .toc li {
+    margin: 3px 0;
+    break-inside: avoid;
+  }
+  .toc a {
+    text-decoration: none;
+    color: var(--ink-2);
+  }
+  .toc a:hover { color: var(--ink); }
+
+  .footer {
+    max-width: 720px;
+    margin: 60px auto 0;
+    padding: 32px 32px 60px;
+    border-top: 1px solid var(--line);
+    font-size: 0.84em;
+    color: var(--ink-3);
+  }
+  .footer p { margin: 4px 0; text-align: left; }
+
+  hr.divider {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 2em 0;
+  }
+
+  /* ── Print: συμπαγής εκτύπωση ─────────────────────── */
+  @media print {
+    html, body { font-size: 11.5px; background: #fff; }
+    .container { max-width: 100%; padding: 0 8px 20px; }
+    .cover { min-height: 95vh; padding: 60px 24px 30px; }
+    section { margin-bottom: 28px; }
+    h3 { margin: 18px 0 6px; }
+    figure { margin: 0.9em 0; page-break-inside: avoid; text-align: center; }
+    figure img { max-height: 320px; width: auto; max-width: 100%; }
+    figure img[src*="architecture"] { max-height: 430px; }
+    figure img[src*="code_"] { max-height: 470px; }
+    figure img[src*="kafka_ui"] { max-height: 280px; }
+    pre { font-size: 0.78em; line-height: 1.4; padding: 10px 12px; page-break-inside: avoid; }
+    .code-compare { gap: 8px; page-break-inside: avoid; }
+    table { page-break-inside: avoid; font-size: 0.88em; }
+    table td, table th { padding: 5px 8px; }
+    .toc { display: none; }
+    .stats-row .stat { padding: 10px 6px; }
+    .footer { margin-top: 24px; padding: 16px 8px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- COVER PAGE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="uni">Ιόνιο Πανεπιστήμιο</div>
+    <div class="department">Τμήμα Πληροφορικής · Ακαδημαϊκό Έτος 2025–2026</div>
+    <div class="course">Πλατφόρμες και Αρχιτεκτονικές Νέφους</div>
+    <h1>Εντοπισμός Arbitrage σε Πραγματικό Χρόνο μεταξύ Στοιχηματικών Εταιριών με Apache Kafka και Apache Spark</h1>
+    <p class="tagline">
+      Σύγκριση Batch και Stream Processing για την έγκαιρη ανίχνευση κερδοφόρων ευκαιριών αρμπιτράζ σε ροή δεδομένων αποδόσεων ποδοσφαιρικών αγώνων από 8 ευρωπαϊκές λίγκες.
+    </p>
+  </div>
+
+  <div class="cover-bottom">
+    <div>
+      <div class="field-label">Φοιτητές</div>
+      <div class="field-value">Χρήστος Καρασακαλίδης, Ευγένιος Χριστόπουλος</div>
+    </div>
+    <div>
+      <div class="field-label">Αριθμοί Μητρώου</div>
+      <div class="field-value">inf2021082 inf2021249</div>
+    </div>
+    <div>
+      <div class="field-label">Διδάσκοντες</div>
+      <div class="field-value">Γεώργιος Δημητρακόπουλος, Ανδρέας Καναβός</div>
+    </div>
+    <div>
+      <div class="field-label">Email</div>
+      <div class="field-value">inf2021082@ionio.gr inf2021249@ionio.gr</div>
+    </div>
+    <div>
+      <div class="field-label">Θεματική Περιοχή</div>
+      <div class="field-value">1 — Επεξεργασία Δεδομένων σε Κατανεμημένα Συστήματα</div>
+    </div>
+    <div>
+      <div class="field-label">Ημερομηνία</div>
+      <div class="field-value">8 Ιουνίου 2026</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MAIN CONTENT -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">Περιεχόμενα</div>
+    <ol>
+      <li><a href="#sec1">Εισαγωγή και Arbitrage</a></li>
+      <li><a href="#sec2">Θεωρητικό υπόβαθρο</a></li>
+      <li><a href="#sec3">Αρχιτεκτονική</a></li>
+      <li><a href="#sec4">Δεδομένα</a></li>
+      <li><a href="#sec5">Υλοποίηση</a></li>
+      <li><a href="#sec6">Πειραματική μεθοδολογία</a></li>
+      <li><a href="#sec7">Αποτελέσματα</a></li>
+      <li><a href="#sec8">Επίδειξη εκτέλεσης</a></li>
+      <li><a href="#sec9">Συμπεράσματα</a></li>
+    </ol>
+  </nav>
+
+  <!-- ── Section 1: Introduction ─────────────────────── -->
+  <section>
+    <h2 id="sec1"><span class="num">1.</span>Εισαγωγή και Arbitrage</h2>
+    <hr class="section-rule">
+
+    <h3>1.1 Τι είναι το arbitrage στις στοιχηματικές αγορές</h3>
+    <p>Σε μια στοιχηματική αγορά με τρία πιθανά αποτελέσματα (Νίκη Γηπεδούχου, Ισοπαλία, Νίκη Φιλοξενούμενου — γνωστή ως 1Χ2), κάθε στοιχηματική εταιρία προσφέρει τη δική της δεκαδική απόδοση για κάθε outcome. Η αντίστροφη τιμή 1/odds αντιστοιχεί στην εξυπακουόμενη πιθανότητα (implied probability). Σε μια ιδεατή «δίκαιη» αγορά χωρίς περιθώριο κέρδους για τον bookmaker, το άθροισμα των τριών εξυπακουόμενων πιθανοτήτων ισούται με 1. Στην πραγματικότητα είναι μεγαλύτερο, καθώς κάθε στοιχηματική εισάγει overround.</p>
+
+    <p>Όταν όμως ληφθούν οι <strong>καλύτερες</strong> αποδόσεις κάθε outcome από <em>διαφορετικές</em> στοιχηματικές, το άθροισμα μπορεί ενίοτε να βρεθεί μικρότερο της μονάδας:</p>
+
+    <pre><code>arbitrage ⟺  1/best_odds_1 + 1/best_odds_X + 1/best_odds_2  &lt;  1.0
+profit_margin  =  1 − Σ(1/best_odds_i)</code></pre>
+
+    <p>Σε αυτή την περίπτωση, ο παίκτης μπορεί να στοιχηματίσει σε όλα τα outcomes με κατάλληλα κατανεμημένα ποσά (αναλογικά με το 1/odds) και να εξασφαλίσει εγγυημένο κέρδος ίσο με το profit_margin, ανεξάρτητα από το τελικό αποτέλεσμα του αγώνα.</p>
+
+    <div class="callout">
+      <div class="callout-title">Παράδειγμα</div>
+      <p>Έστω καλύτερες αποδόσεις 2.20 / 3.60 / 4.00 από τρεις διαφορετικές στοιχηματικές. Το άθροισμα 1/2.20 + 1/3.60 + 1/4.00 = 0.455 + 0.278 + 0.250 = <strong>0.983 &lt; 1.0</strong>. Υπάρχει arbitrage με περιθώριο 1.7%. Στοιχηματίζοντας ποσά αναλογικά (45.5% του συνόλου στο 1, 27.8% στο Χ, 25.0% στο 2), η επιστροφή είναι ίδια σε κάθε ένα από τα τρία πιθανά αποτελέσματα και υπερβαίνει το αρχικό κεφάλαιο κατά 1.7%.</p>
+    </div>
+
+    <h3>1.2 Γιατί το πρόβλημα είναι κατεξοχήν streaming</h3>
+    <p>Οι αποδόσεις στις στοιχηματικές μεταβάλλονται συνεχώς λόγω εισροής στοιχημάτων από το κοινό, εσωτερικών μοντέλων αξιολόγησης κινδύνου, ή νέων πληροφοριών για τον αγώνα (τραυματισμοί, καιρικές συνθήκες, κ.λπ.). Μια arbitrage ευκαιρία δημιουργείται από <em>στιγμιαία ασυμμετρία</em> μεταξύ δύο ή περισσότερων bookmakers και τυπικά διαρκεί <strong>μερικά δευτερόλεπτα</strong> πριν οι αυτόματοι αλγόριθμοι των στοιχηματικών την εξαλείψουν.</p>
+
+    <p>Συνεπώς, οποιοδήποτε σύστημα προσπαθεί να εντοπίσει τέτοιες ευκαιρίες πρέπει να εμφανίζει χαμηλή καθυστέρηση από τη στιγμή που μια απόδοση αλλάζει μέχρι τη στιγμή που εκπέμπεται μια ειδοποίηση arbitrage. Αυτό καθιστά το πρόβλημα ιδανικό για παραδειγματική σύγκριση μεταξύ δύο διαφορετικών προσεγγίσεων κατανεμημένης επεξεργασίας: <strong>Batch</strong> (περιοδική επεξεργασία συσσωρευμένων δεδομένων) έναντι <strong>Stream</strong> (συνεχής επεξεργασία κάθε event μόλις φτάνει).</p>
+
+    <h3>1.3 Στόχοι της εργασίας</h3>
+    <ul>
+      <li>Ανάπτυξη streaming pipeline βασισμένου σε Apache Kafka και Apache Spark.</li>
+      <li>Υλοποίηση δύο ξεχωριστών consumers (Batch και Stream) με κοινή λογική ανίχνευσης arbitrage.</li>
+      <li>Πειραματική σύγκριση των δύο μεθόδων σε τέσσερις διαστάσεις: χρονική καθυστέρηση εντοπισμού (detection latency), διεκπεραιωτική ικανότητα (throughput), σταθερότητα χρόνου επεξεργασίας, και πληρότητα ανίχνευσης (catch rate).</li>
+      <li>Παραγωγή ποσοτικών αποτελεσμάτων που επιτρέπουν τεκμηριωμένη επιλογή αρχιτεκτονικής για παρόμοια προβλήματα.</li>
+    </ul>
+  </section>
+
+
+  <!-- ── Section 2: Theory ──────────────────────────── -->
+  <section>
+    <h2 id="sec2"><span class="num">2.</span>Θεωρητικό υπόβαθρο</h2>
+    <hr class="section-rule">
+
+    <h3>2.1 Big Data και τα τέσσερα V</h3>
+    <p>Ως Big Data ορίζεται σύνολο δεδομένων το οποίο, λόγω όγκου ή πολυπλοκότητας, δεν μπορεί να επεξεργαστεί με παραδοσιακό λογισμικό. Χαρακτηρίζεται από τα τέσσερα V: <strong>Volume</strong> (όγκος), <strong>Velocity</strong> (ταχύτητα παραγωγής), <strong>Variety</strong> (ποικιλία μορφών) και <strong>Veracity</strong> (αξιοπιστία). Στην παρούσα εργασία κυριαρχεί το χαρακτηριστικό Velocity: τα δεδομένα παράγονται σε υψηλό ρυθμό και απαιτούν άμεση επεξεργασία.</p>
+
+    <h3>2.2 Batch vs Stream Processing</h3>
+    <p><strong>Batch processing</strong>: τα δεδομένα συγκεντρώνονται σε χρονικά παράθυρα προκαθορισμένης διάρκειας και επεξεργάζονται μαζικά μετά την ολοκλήρωση του παραθύρου. Παρέχει υψηλή απόδοση σε σταθερό φόρτο εργασίας αλλά εισάγει εγγενή καθυστέρηση τουλάχιστον ίση με το παράθυρο.</p>
+    <p><strong>Stream processing</strong>: τα events επεξεργάζονται μεμονωμένα ή σε πολύ μικρά micro-batches μόλις φτάσουν. Εξασφαλίζει χαμηλή καθυστέρηση αντίδρασης αλλά απαιτεί διαχείριση κατάστασης (state) μεταξύ διαδοχικών events.</p>
+
+    <h3>2.3 Apache Kafka</h3>
+    <p>Το Apache Kafka είναι κατανεμημένο σύστημα μηνυμάτων (distributed message broker) σχεδιασμένο για υψηλό throughput και ανθεκτικότητα. Λειτουργεί ως ενδιάμεσος μεταξύ producers (που στέλνουν μηνύματα) και consumers (που τα διαβάζουν), αποθηκεύοντάς τα σε <em>topics</em> τα οποία υποδιαιρούνται σε <em>partitions</em> για παραλληλισμό. Από την έκδοση 3.x υποστηρίζει τη λειτουργία KRaft, η οποία αντικαθιστά το Zookeeper με ενσωματωμένο μηχανισμό consensus.</p>
+
+    <h3>2.4 Apache Spark</h3>
+    <p>Το Apache Spark είναι framework κατανεμημένης επεξεργασίας δεδομένων που, σε σύγκριση με τον προγενέστερο Hadoop MapReduce, παρέχει σημαντικά βελτιωμένη απόδοση (συνήθως 10× έως 100× σε τυπικά benchmarks) και ευκολότερο API. Υποστηρίζει τόσο batch επεξεργασία (Spark SQL / DataFrame API) όσο και streaming (Spark Structured Streaming) μέσα από κοινή προγραμματιστική διεπαφή, γεγονός που επιτρέπει «apples-to-apples» σύγκριση μεταξύ των δύο παραδειγμάτων.</p>
+
+    <h3>2.5 Λογική ανίχνευσης Arbitrage</h3>
+    <p>Σε στιγμιότυπο μιας αγοράς 1Χ2 με Ν διαφορετικές στοιχηματικές, η ανίχνευση arbitrage συνοψίζεται σε τρία βήματα:</p>
+    <ol>
+      <li>Για κάθε outcome (H/X/A), εντοπίζεται η μέγιστη διαθέσιμη δεκαδική απόδοση μεταξύ όλων των N στοιχηματικών.</li>
+      <li>Υπολογίζεται το άθροισμα των αντιστρόφων αυτών των τριών μέγιστων αποδόσεων.</li>
+      <li>Εάν το άθροισμα είναι μικρότερο της μονάδας (με αμελητέο ε για αποφυγή float noise), έχει εντοπιστεί arbitrage. Το profit margin ισούται με 1 − άθροισμα.</li>
+    </ol>
+  </section>
+
+
+  <!-- ── Section 3: Architecture ────────────────────── -->
+  <section>
+    <h2 id="sec3"><span class="num">3.</span>Αρχιτεκτονική</h2>
+    <hr class="section-rule">
+
+    <p>Η αρχιτεκτονική ακολουθεί κλασικό streaming pattern τριών επιπέδων: <strong>παραγωγός δεδομένων → broker → καταναλωτές</strong>. Όλα τα στοιχεία τρέχουν τοπικά (η Θεματική 1 δεν απαιτεί cloud provider): το Apache Kafka σε container Docker, οι Spark consumers σε λειτουργία <code>local[*]</code> που αξιοποιεί όλους τους διαθέσιμους πυρήνες του μηχανήματος.</p>
+
+    <figure>
+      <img src="images/architecture.png" alt="Αρχιτεκτονική pipeline" style="max-width: 480px;">
+      <figcaption><span class="label">Σχήμα 1.</span> Η αρχιτεκτονική του pipeline: ο producer κάνει replay τα ιστορικά CSV ως ροή OddsUpdate events προς το Kafka (key = <code>match_id</code>), απ' όπου καταναλώνουν παράλληλα οι δύο consumers — αμφότεροι με την κοινή <code>detect_arbitrage()</code> — γράφοντας ευκαιρίες και metrics σε ξεχωριστά αρχεία εξόδου. (Διάγραμμα: Mermaid, πηγή στο <code>report/architecture.mmd</code>.)</figcaption>
+    </figure>
+
+    <h3>Σχεδιαστικές επιλογές</h3>
+    <table>
+      <thead><tr><th>Επιλογή</th><th>Αιτιολόγηση</th></tr></thead>
+      <tbody>
+        <tr><td>Kafka σε KRaft mode</td><td>Απαλείφει την εξάρτηση από Zookeeper, μειώνοντας τα κινούμενα μέρη του πειραματικού περιβάλλοντος</td></tr>
+        <tr><td>3 partitions στο topic</td><td>Επιτρέπει παραλληλισμό κατά την κατανάλωση από το Spark</td></tr>
+        <tr><td>Partition key = match_id</td><td>Διασφαλίζει σειριακή επεξεργασία των ενημερώσεων ενός αγώνα</td></tr>
+        <tr><td>Κοινή <code>detect_arbitrage()</code> και στους δύο consumers</td><td>Οι διαφορές στα αποτελέσματα οφείλονται αποκλειστικά στο paradigm επεξεργασίας και όχι σε διαφορετική υλοποίηση</td></tr>
+        <tr><td>In-memory state στον Stream consumer</td><td>Απλούστερη υλοποίηση από τους stateful operators του Spark· επαρκής για την κλίμακα της εργασίας</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ── Section 4: Dataset ─────────────────────────── -->
+  <section>
+    <h2 id="sec4"><span class="num">4.</span>Δεδομένα</h2>
+    <hr class="section-rule">
+
+    <h3>4.1 Πηγή</h3>
+    <p>Τα δεδομένα προέρχονται από το <a href="https://www.football-data.co.uk/data.php">football-data.co.uk</a>, μια δημόσια αρχειακή πηγή που δημοσιεύει αποτελέσματα ποδοσφαιρικών αγώνων και αντίστοιχες αποδόσεις πολλαπλών στοιχηματικών. Η επιλογή αυτή προτιμήθηκε λόγω άμεσης διαθεσιμότητας των CSV χωρίς λογαριασμό ή έλεγχο ταυτότητας.</p>
+
+    <p>Επελέγησαν 8 ευρωπαϊκές λίγκες × 5 σεζόν (2020–21 έως 2024–25), συνολικά <strong>40 αρχεία CSV</strong> και <strong>14.802 αγώνες</strong>, καλύπτοντας: Αγγλικό Premier League, Αγγλικό Championship, Ισπανικό La Liga, Ιταλικό Serie A, Γερμανικό Bundesliga, Γαλλικό Ligue 1, Ολλανδικό Eredivisie και Πορτογαλικό Primeira Liga.</p>
+
+    <div class="callout">
+      <div class="callout-title">Σημαντικός περιορισμός της πηγής</div>
+      <p>Το dataset παρέχει αποδόσεις τύπου closing/opening ανά αγώνα — όχι intra-match time series. Συνεπώς το arbitrage εντοπίζεται μέσω cross-bookmaker σύγκρισης για ένα δεδομένο γεγονός σε συγκεκριμένο στιγμιότυπο, και όχι μέσω παρακολούθησης της εξέλιξης των αποδόσεων κατά τη διάρκεια του παιχνιδιού.</p>
+    </div>
+
+    <h3>4.2 Κάλυψη στοιχηματικών</h3>
+    <table>
+      <thead>
+        <tr><th>Bookmaker</th><th class="num">Αγώνες με odds</th><th class="num">% κάλυψης</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Bet365</td><td class="num">14.794</td><td class="num">99,9%</td></tr>
+        <tr><td>Pinnacle</td><td class="num">14.793</td><td class="num">99,9%</td></tr>
+        <tr><td>William Hill</td><td class="num">14.125</td><td class="num">95,4%</td></tr>
+        <tr><td>Bet&amp;Win</td><td class="num">13.656</td><td class="num">92,3%</td></tr>
+        <tr><td>Betfair</td><td class="num">2.912</td><td class="num">19,7%</td></tr>
+        <tr><td>1XBet</td><td class="num">2.842</td><td class="num">19,2%</td></tr>
+      </tbody>
+    </table>
+    <p>Τέσσερις στοιχηματικές (Bet365, Pinnacle, William Hill, Bet&amp;Win) καλύπτουν πάνω από το 92% των αγώνων και αποτελούν τη βάση του cross-bookmaker scan. Οι Betfair και 1XBet προσθέτουν επιπλέον σήμα όπου είναι διαθέσιμες.</p>
+
+    <h3>4.3 Προκαταρκτική σάρωση arbitrage</h3>
+    <p>Πριν την υλοποίηση του streaming pipeline, εκτελέστηκε offline σάρωση όλου του dataset για επιβεβαίωση ύπαρξης ευκαιριών arbitrage. Στο σύνολο των 14.798 αγώνων με τουλάχιστον δύο διαθέσιμες στοιχηματικές, εντοπίστηκαν <strong>90 ευκαιρίες</strong>, δηλαδή ποσοστό 0,608%. Το αποτέλεσμα ευθυγραμμίζεται με τη βιβλιογραφία, η οποία αναφέρει τυπικά ποσοστά 0,5%–1% για pre-match arbitrage σε ποδόσφαιρο. Το μεγαλύτερο εντοπισμένο περιθώριο ήταν 9,34% στον αγώνα Paris SG–Metz (16/9/2020).</p>
+  </section>
+
+
+  <!-- ── Section 5: Implementation ──────────────────── -->
+  <section>
+    <h2 id="sec5"><span class="num">5.</span>Υλοποίηση</h2>
+    <hr class="section-rule">
+
+    <h3>5.1 Τεχνολογικό stack</h3>
+    <div class="stats-row">
+      <div class="stat"><div class="num">Python 3.11</div><div class="label">Γλώσσα</div></div>
+      <div class="stat"><div class="num">PySpark 3.5.3</div><div class="label">Επεξεργασία</div></div>
+      <div class="stat"><div class="num">Kafka 3.7.1</div><div class="label">Broker</div></div>
+      <div class="stat"><div class="num">Docker 29</div><div class="label">Containers</div></div>
+    </div>
+
+    <h3>5.2 Producer</h3>
+    <p>Ο producer (<code>producer/producer.py</code>) διαβάζει ολόκληρο το σύνολο των CSV, ταξινομεί τις εγγραφές χρονολογικά με βάση τα πεδία Date και Time, και για κάθε αγώνα παράγει ένα event ανά στοιχηματική που διαθέτει έγκυρες αποδόσεις 1Χ2. Κάθε event έχει την ακόλουθη δομή JSON:</p>
+    <pre><code>{
+  "match_id":      "F1-2020-08-21-Bordeaux-Nantes",
+  "league":        "F1",
+  "home_team":     "Bordeaux",
+  "away_team":     "Nantes",
+  "match_date":    "2020-08-21",
+  "bookmaker":     "Bet365",
+  "odds_home":     2.4,
+  "odds_draw":     3.0,
+  "odds_away":     3.25,
+  "event_time_ms": 1598032800000,
+  "real_time_ms":  1779490227596
+}</code></pre>
+    <p>Το event περιλαμβάνει δύο χρονοσφραγίδες με διακριτό ρόλο: το <code>event_time_ms</code> αντιστοιχεί στη χρονική στιγμή τέλεσης του αγώνα (χρησιμοποιείται για χρονική ομαδοποίηση downstream), ενώ το <code>real_time_ms</code> καταγράφει την wall-clock στιγμή αποστολής του event στο Kafka (χρησιμοποιείται για τον υπολογισμό του end-to-end latency στους consumers).</p>
+
+    <figure>
+      <img src="images/code_producer.png" alt="Κώδικας producer στο VS Code">
+      <figcaption><span class="label">Σχήμα 2.</span> <code>producer/producer.py</code> — ο πυρήνας του producer: ο <code>KafkaProducer</code> δημιουργείται με <code>key_serializer</code> ώστε το <code>match_id</code> να καθορίζει το partition (διατήρηση σειράς ανά αγώνα), το replay ρυθμίζεται από το <code>--speed</code>, και κάθε event σφραγίζεται με <code>real_time_ms</code> ακριβώς πριν το <code>producer.send()</code>.</figcaption>
+    </figure>
+
+    <h3>5.3 Μέθοδος Α — Batch Consumer</h3>
+    <p>Ο Batch consumer (<code>consumers/batch/batch_consumer.py</code>) ακολουθεί λογική polling loop. Σε κάθε επανάληψη του βρόχου:</p>
+    <ol>
+      <li>Ζητούνται από το Kafka τα τρέχοντα end offsets για κάθε partition του topic μέσω σύντομου κύκλου ζωής kafka-python client.</li>
+      <li>Εκτελείται Spark batch read με ρητά JSON offsets ορίζοντας ως starting offsets τα προηγούμενα ending offsets και ως ending offsets τα τρέχοντα.</li>
+      <li>Με χρήση window function διατηρείται μόνο η πιο πρόσφατη απόδοση ανά συνδυασμό (match_id, bookmaker).</li>
+      <li>Για κάθε αγώνα με τουλάχιστον δύο στοιχηματικές, καλείται η <code>detect_arbitrage()</code>.</li>
+      <li>Ο βρόχος αναπαύεται για χρόνο ίσο με το <code>window_seconds</code> πριν την επόμενη επανάληψη.</li>
+    </ol>
+    <p>Η αναμενόμενη μέση καθυστέρηση εντοπισμού είναι περίπου ίση με το ήμισυ του παραθύρου, ενώ η μέγιστη φτάνει το πλήρες παράθυρο.</p>
+
+    <figure>
+      <img src="images/code_batch.png" alt="Κώδικας batch consumer στο VS Code">
+      <figcaption><span class="label">Σχήμα 3.</span> <code>consumers/batch/batch_consumer.py</code> — ο polling βρόχος του Batch consumer: λήψη των τρεχόντων end offsets, έλεγχος για νέα μηνύματα (skip αν το παράθυρο είναι κενό), και το πεπερασμένο <code>spark.read.format("kafka")</code> με ρητά <code>startingOffsets</code>/<code>endingOffsets</code>.</figcaption>
+    </figure>
+
+    <h3>5.4 Μέθοδος Β — Stream Consumer</h3>
+    <p>Ο Stream consumer (<code>consumers/stream/stream_consumer.py</code>) αξιοποιεί το Spark Structured Streaming με trigger <code>processingTime</code> ορισμένο στα 200 ms. Σε κάθε micro-batch, ένα <code>foreachBatch</code> callback εκτελεί τα ακόλουθα βήματα:</p>
+    <ol>
+      <li>Ενημερώνεται ένα Python dictionary που διατηρεί τις τελευταίες αποδόσεις ανά (match_id, bookmaker).</li>
+      <li>Καταγράφονται τα <em>touched matches</em>, δηλαδή οι αγώνες που έλαβαν τουλάχιστον μία ενημέρωση στο τρέχον micro-batch.</li>
+      <li>Η <code>detect_arbitrage()</code> καλείται <strong>μόνο</strong> για τα touched matches (incremental work), όχι για όλους τους γνωστούς αγώνες.</li>
+      <li>Εφαρμόζεται de-duplication μέσω έλεγχου μεταβολής του profit margin: μια ευκαιρία δεν επανεκπέμπεται αν το νέο margin διαφέρει λιγότερο από 10⁻⁴ από το προηγουμένως αναφερθέν.</li>
+    </ol>
+
+    <figure>
+      <img src="images/code_stream.png" alt="Κώδικας stream consumer στο VS Code">
+      <figcaption><span class="label">Σχήμα 4.</span> <code>consumers/stream/stream_consumer.py</code> — η καρδιά του Stream consumer: το <code>spark.readStream.format("kafka")</code>, ο δηλωτικός ορισμός του streaming query με <code>foreachBatch</code> callback, <code>checkpointLocation</code> και <code>trigger(processingTime)</code>, και ο graceful τερματισμός μέσω signal handler.</figcaption>
+    </figure>
+
+    <h3>5.5 Λογική ανίχνευσης</h3>
+    <p>Η <code>arbitrage/detector.py</code> υλοποιεί τη μαθηματική λογική που περιγράφηκε στην παράγραφο 2.5. Αποτελεί τη μοναδική πηγή αλήθειας για την ανίχνευση και χρησιμοποιείται από αμφότερους τους consumers, εξασφαλίζοντας έτσι ότι τυχόν διαφορές αποτελεσμάτων μεταξύ Batch και Stream οφείλονται αποκλειστικά στην αρχιτεκτονική επιλογή και όχι σε διαφορετική λογική υπολογισμού.</p>
+
+    <figure>
+      <img src="images/code_detector.png" alt="Κώδικας detector στο VS Code">
+      <figcaption><span class="label">Σχήμα 5.</span> <code>arbitrage/detector.py</code> — η κοινή λογική ανίχνευσης: <code>implied_probability_sum()</code> (άθροισμα 1/odds), <code>_pick_best()</code> (καλύτερη απόδοση ανά outcome) και <code>detect_arbitrage()</code> που επιστρέφει <code>ArbitrageOpportunity</code> μόνο όταν το margin υπερβαίνει το ε (προστασία από floating-point noise).</figcaption>
+    </figure>
+
+    <h3>5.6 Σύγκριση κώδικα: πού ακριβώς διαφέρουν οι δύο υλοποιήσεις</h3>
+    <p>Παρότι οι δύο consumers μοιράζονται την ίδια λογική ανίχνευσης, ο τρόπος με τον οποίο <em>καταναλώνουν</em> τα δεδομένα από το Kafka είναι θεμελιωδώς διαφορετικός. Η πρώτη διαφορά εντοπίζεται στο σημείο ανάγνωσης: ο Batch χρησιμοποιεί <code>spark.read</code> (πεπερασμένη ανάγνωση με ρητά όρια offsets), ενώ ο Stream χρησιμοποιεί <code>spark.readStream</code> (συνεχές query χωρίς «τέλος»).</p>
+
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label">Batch — spark.read (batch_consumer.py)</div>
+        <pre class="vsdark"><code><span class="c1"># Polling loop: ο ΔΙΚΟΣ μας κώδικας αποφασίζει</span>
+<span class="c1"># πότε και τι θα διαβαστεί.</span>
+<span class="k">while</span> <span class="ow">not</span> <span class="n">stop</span><span class="p">:</span>
+    <span class="c1"># 1. Ρωτάμε το Kafka πού βρίσκεται το tail</span>
+    <span class="n">end_offsets</span> <span class="o">=</span> <span class="n">fetch_end_offsets</span><span class="p">(</span><span class="n">servers</span><span class="p">,</span> <span class="n">topic</span><span class="p">)</span>
+
+    <span class="c1"># 2. Πεπερασμένο read: από τον cursor</span>
+    <span class="c1">#    μέχρι τα τρέχοντα end offsets</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">topic</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;startingOffsets&quot;</span><span class="p">,</span>
+                <span class="n">starting_offsets_json</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;endingOffsets&quot;</span><span class="p">,</span>
+                <span class="n">ending_offsets_json</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">load</span><span class="p">())</span>
+
+    <span class="c1"># ... detection σε ΟΛΟ το παράθυρο ...</span>
+
+    <span class="c1"># 3. Χειροκίνητη προώθηση cursor</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">end_offsets</span><span class="p">)</span>
+
+    <span class="c1"># 4. Αδράνεια μέχρι το επόμενο παράθυρο</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">window_seconds</span> <span class="o">-</span> <span class="n">elapsed</span><span class="p">)</span></code></pre>
+      </div>
+      <div class="code-col">
+        <div class="code-label">Stream — spark.readStream (stream_consumer.py)</div>
+        <pre class="vsdark"><code><span class="c1"># Συνεχές streaming query: το SPARK αποφασίζει</span>
+<span class="c1"># πότε τρέχει το επόμενο micro-batch.</span>
+<span class="n">raw</span> <span class="o">=</span> <span class="p">(</span><span class="n">spark</span><span class="o">.</span><span class="n">readStream</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;kafka&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;subscribe&quot;</span><span class="p">,</span> <span class="n">topic</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;startingOffsets&quot;</span><span class="p">,</span> <span class="s2">&quot;earliest&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">load</span><span class="p">())</span>
+
+<span class="c1"># Δηλωτικός ορισμός: callback ανά micro-batch</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">writeStream</span>
+    <span class="o">.</span><span class="n">foreachBatch</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">process_batch</span><span class="p">)</span>
+    <span class="c1"># Τα offsets τα διαχειρίζεται ΤΟ SPARK</span>
+    <span class="c1"># αυτόματα μέσω checkpoint directory</span>
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;checkpointLocation&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">))</span>
+    <span class="c1"># Νέο micro-batch κάθε 200 ms</span>
+    <span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">processingTime</span><span class="o">=</span><span class="s2">&quot;200 milliseconds&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span><span class="p">())</span>
+
+<span class="c1"># Ο driver απλώς περιμένει — δεν υπάρχει</span>
+<span class="c1"># polling loop ούτε sleep()</span>
+<span class="n">query</span><span class="o">.</span><span class="n">awaitTermination</span><span class="p">()</span></code></pre>
+      </div>
+    </div>
+
+    <p>Η δεύτερη διαφορά αφορά τη <strong>διατήρηση του «τελευταίου» odds ανά (αγώνα, στοιχηματική)</strong>. Ο Batch, επειδή βλέπει κάθε φορά ένα αυτοτελές σύνολο δεδομένων, το λύνει δηλωτικά με SQL window function. Ο Stream, επειδή βλέπει μόνο τα νέα events κάθε micro-batch, χρειάζεται <em>state</em> που επιβιώνει μεταξύ διαδοχικών micro-batches:</p>
+
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label">Batch — stateless, SQL window function</div>
+        <pre class="vsdark"><code><span class="c1"># Κάθε batch είναι αυτοτελές: η deduplication</span>
+<span class="c1"># γίνεται δηλωτικά μέσα στο DataFrame.</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">expr</span><span class="p">(</span>
+    <span class="s2">&quot;row_number() over (&quot;</span>
+    <span class="s2">&quot;  partition by match_id, bookmaker&quot;</span>
+    <span class="s2">&quot;  order by event_time_ms desc)&quot;</span><span class="p">)</span>
+
+<span class="n">snapshot</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;_rn&quot;</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+              <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;_rn = 1&quot;</span><span class="p">)</span>
+              <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;_rn&quot;</span><span class="p">))</span>
+
+<span class="c1"># Detection σε ΟΛΑ τα matches του batch</span>
+<span class="n">opps</span> <span class="o">=</span> <span class="n">detect_for_partition</span><span class="p">(</span>
+    <span class="n">snapshot</span><span class="o">.</span><span class="n">collect</span><span class="p">())</span></code></pre>
+      </div>
+      <div class="code-col">
+        <div class="code-label">Stream — stateful, incremental ενημέρωση</div>
+        <pre class="vsdark"><code><span class="c1"># Το state ζει ΕΞΩ από το micro-batch και</span>
+<span class="c1"># ενημερώνεται incremental σε κάθε callback.</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latest</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">book</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">cur</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">cur</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">latest</span><span class="p">[</span><span class="n">mid</span><span class="p">][</span><span class="n">book</span><span class="p">]</span> <span class="o">=</span> <span class="n">ev</span>
+    <span class="n">touched_matches</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span>
+
+<span class="c1"># Detection ΜΟΝΟ στα matches που άλλαξαν</span>
+<span class="c1"># σε αυτό το micro-batch (incremental work)</span>
+<span class="k">for</span> <span class="n">mid</span> <span class="ow">in</span> <span class="n">touched_matches</span><span class="p">:</span>
+    <span class="n">opp</span> <span class="o">=</span> <span class="n">detect_arbitrage</span><span class="p">(</span>
+        <span class="n">match_id</span><span class="o">=</span><span class="n">mid</span><span class="p">,</span>
+        <span class="n">home_odds</span><span class="o">=...</span><span class="p">,</span> <span class="n">draw_odds</span><span class="o">=...</span><span class="p">,</span>
+        <span class="n">away_odds</span><span class="o">=...</span><span class="p">,</span>
+        <span class="n">detected_at_ms</span><span class="o">=</span><span class="n">now_ms</span><span class="p">)</span></code></pre>
+      </div>
+    </div>
+
+    <p>Συνοπτικά, οι δομικές διαφορές των δύο υλοποιήσεων:</p>
+    <table>
+      <thead><tr><th>Διάσταση</th><th>Batch Consumer</th><th>Stream Consumer</th></tr></thead>
+      <tbody>
+        <tr><td>Kafka API</td><td><code>spark.read</code> — πεπερασμένο read</td><td><code>spark.readStream</code> — συνεχές query</td></tr>
+        <tr><td>Χρονισμός</td><td>Δικός μας polling loop με <code>time.sleep()</code></td><td>Trigger του Spark (<code>processingTime=200ms</code>)</td></tr>
+        <tr><td>Διαχείριση offsets</td><td>Χειροκίνητος cursor ανά partition</td><td>Αυτόματη, μέσω checkpoint directory</td></tr>
+        <tr><td>Deduplication</td><td>SQL window function (stateless)</td><td>In-memory state dict (stateful)</td></tr>
+        <tr><td>Εύρος detection</td><td>Όλα τα matches του παραθύρου</td><td>Μόνο τα <em>touched</em> matches του micro-batch</td></tr>
+        <tr><td>Λογική ανίχνευσης</td><td colspan="2" style="text-align:center">Κοινή — <code>arbitrage/detector.py :: detect_arbitrage()</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ── Section 6: Methodology ─────────────────────── -->
+  <section>
+    <h2 id="sec6"><span class="num">6.</span>Πειραματική μεθοδολογία</h2>
+    <hr class="section-rule">
+
+    <h3>6.1 Πειραματικό περιβάλλον</h3>
+    <p>Όλα τα πειράματα εκτελέστηκαν σε MacBook με Apple Silicon. Το Kafka τρέχει σε container Docker με 1 broker και 3 partitions· το Spark σε λειτουργία <code>local[*]</code> που αξιοποιεί όλους τους πυρήνες του μηχανήματος. Δεν χρησιμοποιείται cluster πολλαπλών κόμβων· η σύγκριση παραδειγμάτων είναι ανεξάρτητη από αυτό, καθώς οι μετρήσεις αφορούν την αρχιτεκτονική επιλογή και όχι την κλιμακωσιμότητα.</p>
+
+    <h3>6.2 Αυτοματοποιημένος orchestrator</h3>
+    <p>Για διασφάλιση της επαναληψιμότητας, αναπτύχθηκε orchestrator (<code>benchmarks/run_experiment.py</code>) που αυτοματοποιεί τα παρακάτω βήματα ανά πείραμα:</p>
+    <ol>
+      <li>Διαγραφή και αναδημιουργία του Kafka topic (καθαρή κατάσταση).</li>
+      <li>Εκκίνηση των δύο consumers σε ξεχωριστές υποδιεργασίες.</li>
+      <li>Αναμονή 5 δευτερολέπτων warmup για ολοκλήρωση της εκκίνησης του Spark JVM.</li>
+      <li>Εκτέλεση του producer.</li>
+      <li>Drain period μετά την ολοκλήρωση του producer, ώστε οι consumers να επεξεργαστούν το backlog.</li>
+      <li>Αποστολή SIGINT στους consumers για graceful shutdown.</li>
+      <li>Αποθήκευση των αποτελεσμάτων σε tagged υποφάκελο μαζί με αρχείο <code>config.json</code> που περιλαμβάνει όλα τα CLI args.</li>
+    </ol>
+
+    <h3>6.3 Μετρικές</h3>
+    <table>
+      <thead><tr><th>Μετρική</th><th>Ορισμός</th></tr></thead>
+      <tbody>
+        <tr><td>Per-batch processing time</td><td>Wall-clock χρόνος που πήρε ένα batch ή micro-batch να επεξεργαστεί</td></tr>
+        <tr><td>Rows read per batch</td><td>Πλήθος events που καταναλώθηκαν σε ένα batch</td></tr>
+        <tr><td>End-to-end latency</td><td>(Wall-clock στιγμή ανίχνευσης) − (μέγιστο real_time_ms των events που συνθέτουν την ευκαιρία)</td></tr>
+        <tr><td>Throughput</td><td>Συνολικά events / διάρκεια εκτέλεσης (events ανά δευτερόλεπτο)</td></tr>
+        <tr><td>Catch coverage</td><td>Σύνολο μοναδικών match_ids που εντόπισε κάθε μέθοδος</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.4 Σενάρια</h3>
+    <p>Εκτελέστηκαν δύο σενάρια με ταυτόσημο dataset (10.000 events) και ίδιες παραμέτρους producer και Stream consumer. Μεταβάλλεται μόνο το παράθυρο του Batch consumer, ώστε να απομονωθεί η επίδραση αυτής της παραμέτρου:</p>
+    <table>
+      <thead>
+        <tr><th>Tag</th><th>Batch window</th><th>Stream trigger</th><th>Producer speed</th><th>Σκοπός</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>fast</code></td><td>10 s</td><td>200 ms</td><td>max (0)</td><td>Baseline σύγκρισης</td></tr>
+        <tr><td><code>slow_batch</code></td><td>30 s</td><td>200 ms</td><td>max (0)</td><td>Παρατήρηση επίδρασης μεγαλύτερου batch window</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ── Section 7: Results ─────────────────────────── -->
+  <section>
+    <h2 id="sec7"><span class="num">7.</span>Αποτελέσματα</h2>
+    <hr class="section-rule">
+
+    <h3>7.1 Συγκεντρωτικός πίνακας</h3>
+    <table>
+      <thead>
+        <tr><th>Tag</th><th>Method</th><th class="num">Events</th><th class="num">Opps</th><th class="num">Lat p50</th><th class="num">Lat p95</th><th class="num">Throughput</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>fast</td><td>Batch</td><td class="num">10.000</td><td class="num">9</td><td class="num">9,75 s</td><td class="num">9,86 s</td><td class="num">334 ev/s</td></tr>
+        <tr><td>fast</td><td><strong>Stream</strong></td><td class="num">10.000</td><td class="num">9</td><td class="num"><strong>1,43 s</strong></td><td class="num"><strong>1,53 s</strong></td><td class="num"><strong>2.391 ev/s</strong></td></tr>
+        <tr><td>slow_batch</td><td>Batch</td><td class="num">10.000</td><td class="num">9</td><td class="num">29,87 s</td><td class="num">29,96 s</td><td class="num">300 ev/s</td></tr>
+        <tr><td>slow_batch</td><td><strong>Stream</strong></td><td class="num">10.000</td><td class="num">9</td><td class="num"><strong>1,57 s</strong></td><td class="num"><strong>1,62 s</strong></td><td class="num"><strong>2.396 ev/s</strong></td></tr>
+      </tbody>
+    </table>
+
+    <h3>7.2 Επικύρωση ορθότητας</h3>
+    <p>Και οι δύο μέθοδοι, σε αμφότερα τα πειράματα, εντοπίζουν τις ίδιες ακριβώς 9 arbitrage ευκαιρίες. Η ταυτόσημη πληρότητα ανίχνευσης αποτελεί προαπαιτούμενο για να έχει νόημα η σύγκριση των υπόλοιπων μετρικών: αποδεικνύει ότι όποια διαφορά εμφανίζεται στις λοιπές διαστάσεις οφείλεται αποκλειστικά στις χρονικές ιδιότητες των δύο παραδειγμάτων και όχι σε διαφορές στην ποιότητα ανίχνευσης.</p>
+
+    <h3>7.3 Σύγκριση latency</h3>
+    <figure>
+      <img src="images/latency_p50_bars.png" alt="Median latency bars">
+      <figcaption><span class="label">Σχήμα 6.</span> Median end-to-end detection latency ανά μέθοδο και σενάριο. Η Stream μέθοδος εμφανίζει σταθερή latency ~1,5 s ανεξαρτήτως configuration, ενώ η Batch κλιμακώνεται γραμμικά με το παράθυρο.</figcaption>
+    </figure>
+
+    <div class="callout">
+      <div class="callout-title">Κεντρικό εύρημα</div>
+      <p>Όταν το batch window τριπλασιάζεται από 10 s σε 30 s, η median Batch latency τριπλασιάζεται αντίστοιχα (9,75 s → 29,87 s). Η median Stream latency παραμένει πρακτικά σταθερή (1,43 s → 1,57 s). Το εύρημα επιβεβαιώνει τη θεωρητική σχέση <em>batch latency ≈ window</em>, η οποία προκύπτει από το γεγονός ότι ένα event το οποίο φτάνει στο Kafka αμέσως μετά την έναρξη ενός batch αναμένει σχεδόν ολόκληρο το παράθυρο μέχρι την επόμενη εκτέλεση.</p>
+    </div>
+
+    <figure>
+      <img src="images/latency_p95_bars.png" alt="p95 latency bars">
+      <figcaption><span class="label">Σχήμα 7.</span> p95 latency. Δεν παρατηρείται long-tail συμπεριφορά στη Stream μέθοδο: το p95 βρίσκεται οριακά πάνω από το p50.</figcaption>
+    </figure>
+
+    <h3>7.4 Σωρευτική κατανομή latency</h3>
+    <figure>
+      <img src="images/latency_cdf.png" alt="Latency CDF">
+      <figcaption><span class="label">Σχήμα 8.</span> Σωρευτική κατανομή (CDF) end-to-end latency για το σενάριο <code>fast</code>. Η συμπιεσμένη κατανομή του Stream γύρω στα 1,4–1,6 s υποδηλώνει προβλέψιμη απόκριση.</figcaption>
+    </figure>
+
+    <h3>7.5 Throughput</h3>
+    <figure>
+      <img src="images/throughput_bars.png" alt="Throughput bars">
+      <figcaption><span class="label">Σχήμα 9.</span> Throughput σε events/sec. Η Stream μέθοδος επιτυγχάνει 7–8× υψηλότερο throughput.</figcaption>
+    </figure>
+    <p>Το αποτέλεσμα αυτό αντιβαίνει στη συνήθη παραδοχή ότι το batch processing παρέχει μεγαλύτερη διεκπεραιωτική ικανότητα. Η εξήγηση εντοπίζεται στο γεγονός ότι ο Batch consumer δαπανά σημαντικό μέρος του χρόνου του σε <em>idle waits</em> μεταξύ διαδοχικών batches (sleep μέχρι τη συμπλήρωση του παραθύρου), ενώ ο Stream consumer επεξεργάζεται συνεχώς. Σε εργασίες με σταθερό φόρτο και μεγαλύτερα παράθυρα, η σύγκριση ενδέχεται να αντιστραφεί.</p>
+
+    <h3>7.6 Σταθερότητα χρόνου επεξεργασίας</h3>
+    <figure>
+      <img src="images/processing_time_box.png" alt="Processing time boxplot">
+      <figcaption><span class="label">Σχήμα 10.</span> Κατανομή per-batch processing time. Η Stream μέθοδος εμφανίζει σημαντικά μικρότερη διασπορά.</figcaption>
+    </figure>
+    <p>Η median per-batch processing time είναι παραπλήσια στις δύο μεθόδους (345 ms Batch, 541 ms Stream), αλλά ο Batch consumer εμφανίζει σημαντικά μεγαλύτερη διασπορά: το p95 ξεπερνά τα 3,2 s, ενώ του Stream παραμένει κάτω από 800 ms. Αυτό οφείλεται στο ότι το πρώτο batch κάθε εκτέλεσης πρέπει να καταναλώσει το πλήρες backlog ταυτόχρονα, ενώ τα stream micro-batches έχουν σταθερά μικρά μεγέθη.</p>
+
+    <h3>7.7 Πληρότητα ανίχνευσης</h3>
+    <figure>
+      <img src="images/catch_overlap.png" alt="Catch overlap">
+      <figcaption><span class="label">Σχήμα 11.</span> Σύνολο μοναδικών arbitrage ευκαιριών ανά μέθοδο. Δεν υπάρχουν ευκαιρίες αποκλειστικά ανιχνευμένες από κάποια από τις δύο μεθόδους.</figcaption>
+    </figure>
+  </section>
+
+
+  <!-- ── Section 8: Live demo walkthrough ───────────── -->
+  <section>
+    <h2 id="sec8"><span class="num">8.</span>Επίδειξη εκτέλεσης</h2>
+    <hr class="section-rule">
+
+    <p>Η ενότητα αυτή τεκμηριώνει βήμα-βήμα μια πλήρη εκτέλεση του pipeline, όπως παρουσιάστηκε και στη ζωντανή επίδειξη της εργασίας. Χρησιμοποιούνται τέσσερα terminals: ένα για τη διαχείριση της υποδομής, ένα για κάθε consumer, και ένα για τον producer. Για την ευκολία της ζωντανής επίδειξης τα βήματα τυλίγονται στο βοηθητικό script <code>demo.sh</code> — έναν λεπτό wrapper που απλώς εκτελεί τις παρακάτω εντολές (αυτές εμφανίζονται και στα screenshots):</p>
+
+    <table>
+      <thead><tr><th>Βήμα</th><th>Wrapper</th><th>Πραγματική εντολή που εκτελείται</th></tr></thead>
+      <tbody>
+        <tr><td>Καθαρό topic</td><td><code>demo.sh clean</code></td><td><code>kafka-topics.sh --delete / --create --partitions 3</code> (μέσα στο container)</td></tr>
+        <tr><td>Stream consumer</td><td><code>demo.sh stream</code></td><td><code>python -m consumers.stream.stream_consumer --trigger-ms 200</code></td></tr>
+        <tr><td>Batch consumer</td><td><code>demo.sh batch 8</code></td><td><code>python -m consumers.batch.batch_consumer --window-seconds 8</code></td></tr>
+        <tr><td>Αποστολή events</td><td><code>demo.sh send 5000</code></td><td><code>python -m producer.producer --speed 0 --limit 5000</code></td></tr>
+        <tr><td>Σύνοψη</td><td><code>demo.sh results</code></td><td>Pretty-print των <code>benchmarks/results/*_opps.jsonl</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>8.1 Βήμα 1 — Εκκίνηση υποδομής και καθαρό topic</h3>
+    <p>Το Kafka (KRaft mode) και το Kafka UI εκκινούν ως Docker containers με <code>docker compose up -d</code>. Στη συνέχεια το topic <code>betting-odds</code> διαγράφεται και αναδημιουργείται με το εργαλείο <code>kafka-topics.sh</code> (εκτελείται μέσα στο container μέσω <code>docker exec</code>) με 3 partitions, ώστε κάθε εκτέλεση να ξεκινά από μηδενική κατάσταση — χωρίς παλιά μηνύματα, offsets ή checkpoints.</p>
+    <figure>
+      <img src="images/demo_1_setup.png" alt="Docker containers και δημιουργία topic">
+      <figcaption><span class="label">Σχήμα 12.</span> Εκκίνηση υποδομής: τα δύο containers (<code>arbitrage-kafka</code> στη θύρα 9092, <code>arbitrage-kafka-ui</code> στη θύρα 8080) και η αναδημιουργία του topic με <code>kafka-topics.sh --delete</code> / <code>--create --partitions 3 --replication-factor 1</code>.</figcaption>
+    </figure>
+
+    <h3>8.2 Βήμα 2 — Εκκίνηση των δύο consumers</h3>
+    <p>Σε δύο ξεχωριστά terminals εκκινούν ο Stream consumer (trigger 200 ms) και ο Batch consumer (window 8 s). Και οι δύο συνδέονται στο ίδιο topic και περιμένουν δεδομένα — ο Stream μέσω συνεχούς streaming query, ο Batch μέσω polling loop που «ξυπνά» κάθε 8 δευτερόλεπτα (τα κενά batches 1–4 στο Σχήμα 17 είναι ακριβώς αυτά τα άδεια παράθυρα πριν την άφιξη δεδομένων).</p>
+
+    <h3>8.3 Βήμα 3 — Αποστολή 5.000 events</h3>
+    <p>Ο producer διαβάζει και τα 14.802 matches, τα ταξινομεί χρονολογικά και στέλνει τα πρώτα 5.000 events στο Kafka με μέγιστη ταχύτητα (<code>--speed 0</code>). Η αποστολή ολοκληρώνεται σε 0,3 δευτερόλεπτα με μέσο ρυθμό ~15.000 msg/s — απόδειξη ότι ο producer δεν αποτελεί bottleneck της σύγκρισης.</p>
+    <figure>
+      <img src="images/demo_2_send.png" alt="Producer στέλνει 5000 events">
+      <figcaption><span class="label">Σχήμα 13.</span> Ο producer στέλνει 5.000 events σε 0,3 s. Ο στιγμιαίος ρυθμός φτάνει τα ~24.000 msg/s.</figcaption>
+    </figure>
+
+    <p>Η άφιξη των μηνυμάτων επιβεβαιώνεται στο Kafka UI: 5.000 μηνύματα κατανεμημένα στα 3 partitions (1.719 / 1.548 / 1.733). Η σχεδόν ομοιόμορφη κατανομή προκύπτει από το hashing του partition key (<code>match_id</code>).</p>
+    <figure>
+      <img src="images/kafka_ui_topic.png" alt="Kafka UI - topic overview">
+      <figcaption><span class="label">Σχήμα 14.</span> Kafka UI, Overview του topic <code>betting-odds</code>: Message Count 5.000, 3 partitions με ισορροπημένη κατανομή μέσω του partition key.</figcaption>
+    </figure>
+    <figure>
+      <img src="images/kafka_ui_messages.png" alt="Kafka UI - messages">
+      <figcaption><span class="label">Σχήμα 15.</span> Τα ίδια τα μηνύματα στο topic: κάθε event έχει key το <code>match_id</code> και value το OddsUpdate JSON. Διακρίνονται διαδοχικά events του ίδιου αγώνα (π.χ. <code>F1-2020-08-22-Lille-Rennes</code>) από διαφορετικές στοιχηματικές — ακριβώς η ασυμμετρία που αναζητούν οι consumers.</figcaption>
+    </figure>
+
+    <h3>8.4 Βήμα 4 — Οι δύο consumers εντοπίζουν τα arbitrage</h3>
+    <p>Ο Stream consumer παραλαμβάνει και τα 5.000 events στο αμέσως επόμενο micro-batch: στο <code>batch=2</code> επεξεργάζεται 5.000 rows που αφορούν 1.253 αγώνες (touched matches) και εντοπίζει και τις 7 ευκαιρίες σε 1.110 ms — περίπου 1,3 δευτερόλεπτα μετά την αποστολή.</p>
+    <figure>
+      <img src="images/demo_3_stream.png" alt="Stream consumer output">
+      <figcaption><span class="label">Σχήμα 16.</span> Stream consumer: στο micro-batch 2 καταναλώνει και τα 5.000 events και εντοπίζει <code>opps=7</code> σε ~1,1 s επεξεργασίας.</figcaption>
+    </figure>
+
+    <p>Ο Batch consumer, αντίθετα, «κοιμάται» μέχρι τη λήξη του τρέχοντος παραθύρου: τα batches 1–4 είναι κενά, και τα δεδομένα επεξεργάζονται μαζικά στο <code>batch=5</code> — περίπου 10 δευτερόλεπτα μετά την αποστολή (αναμονή παραθύρου + 3,5 s επεξεργασίας του πλήρους backlog). Η διαφορά αυτή είναι οπτικοποιημένη στιγμή προς στιγμή η θεωρητική σχέση <em>batch latency ≈ window</em> της ενότητας 7.</p>
+    <figure>
+      <img src="images/demo_4_batch.png" alt="Batch consumer output">
+      <figcaption><span class="label">Σχήμα 17.</span> Batch consumer (window 8 s): κενά παράθυρα πριν και μετά την αποστολή· όλη η δουλειά συμβαίνει στο <code>batch=5</code> (<code>rows=5000, opps=7, ms=3534</code>). Εμφανές και το spike του processing time όταν καταναλώνεται ολόκληρο το backlog μονομιάς (πρβ. Σχήμα 10).</figcaption>
+    </figure>
+
+    <h3>8.5 Βήμα 5 — Επαλήθευση αποτελεσμάτων</h3>
+    <p>Κάθε consumer γράφει τις ευκαιρίες που εντοπίζει στο δικό του αρχείο εξόδου (<code>stream_opps.jsonl</code> / <code>batch_opps.jsonl</code>)· το <code>demo.sh results</code> απλώς τα διαβάζει και τα μορφοποιεί σε συγκριτική λίστα. Αμφότερες οι μέθοδοι εντοπίζουν τα ίδια 7 arbitrage — μεταξύ αυτών και το μεγαλύτερο περιθώριο του dataset (Paris SG–Metz, 9,34%) — επιβεβαιώνοντας ζωντανά την ταυτόσημη πληρότητα ανίχνευσης της παραγράφου 7.2: η διαφορά των δύο παραδειγμάτων είναι αμιγώς θέμα χρονισμού, όχι ορθότητας.</p>
+    <figure>
+      <img src="images/demo_5_results.png" alt="Demo results - both methods find same 7 arbitrages">
+      <figcaption><span class="label">Σχήμα 18.</span> Σύνοψη των <code>benchmarks/results/*_opps.jsonl</code> (μέσω <code>demo.sh results</code>): Stream και Batch αναφέρουν τις ίδιες ακριβώς 7 ευκαιρίες (με διαφορετική σειρά καταγραφής, καθώς ο Stream γράφει με τη σειρά εντοπισμού ανά micro-batch).</figcaption>
+    </figure>
+  </section>
+
+
+  <!-- ── Section 9: Conclusions ─────────────────────── -->
+  <section>
+    <h2 id="sec9"><span class="num">9.</span>Συμπεράσματα</h2>
+    <hr class="section-rule">
+
+    <h3>9.1 Σύνοψη ευρημάτων</h3>
+    <ol>
+      <li><strong>Ορθότητα.</strong> Αμφότερες οι μέθοδοι παράγουν ταυτόσημα σύνολα ανίχνευσης. Η επιλογή αρχιτεκτονικής δεν επηρεάζει την ακρίβεια του εντοπισμού.</li>
+      <li><strong>Latency.</strong> Ο Stream consumer υπερτερεί κατά παράγοντα 6,8× έως 19× ανάλογα με τη διαμόρφωση του Batch. Σημαντικότερο: η Stream latency είναι ανεξάρτητη του configuration, ενώ η Batch latency κλιμακώνεται γραμμικά με το παράθυρο.</li>
+      <li><strong>Throughput.</strong> Ο Stream consumer επιτυγχάνει 7–8× υψηλότερο throughput στο συγκεκριμένο πειραματικό setup, εύρημα που αντιβαίνει σε ευρέως διαδεδομένες αντιλήψεις περί υπεροχής του batch.</li>
+      <li><strong>Σταθερότητα.</strong> Η κατανομή per-batch processing time είναι σαφώς πιο συμπιεσμένη στη Stream μέθοδο.</li>
+    </ol>
+
+    <h3>9.2 Πρακτική σύσταση</h3>
+    <div class="callout">
+      <p>Για ένα παραγωγικό σύστημα ανίχνευσης arbitrage σε στοιχηματικές αποδόσεις, η Stream αρχιτεκτονική είναι σαφώς προτιμότερη. Οι ευκαιρίες arbitrage έχουν διάρκεια ζωής της τάξης των δευτερολέπτων, καθιστώντας απαγορευτική την καθυστέρηση ενός batch consumer με window 30 s ή μεγαλύτερο. Η Batch αρχιτεκτονική παραμένει χρήσιμη μόνο για ιστορική ανάλυση και reporting όπου δεν απαιτείται απόκριση πραγματικού χρόνου.</p>
+    </div>
+
+    <h3>9.3 Περιορισμοί της μελέτης</h3>
+    <ul>
+      <li><strong>Single-machine setup.</strong> Η σύγκριση πραγματοποιήθηκε σε ένα μηχάνημα. Σε πραγματικό cluster πολλαπλών executors, οι σχετικές αναλογίες ενδέχεται να μεταβληθούν.</li>
+      <li><strong>Pre-match odds μόνο.</strong> Το dataset δεν περιλαμβάνει intra-match (live) movements των αποδόσεων.</li>
+      <li><strong>Driver-side state.</strong> Στον Stream consumer η κατάσταση διατηρείται σε Python dict στον driver, χωρίς δυνατότητα checkpointing ή recovery. Για παραγωγική κλίμακα 10⁷+ αγώνων θα απαιτούνταν stateful Spark operators με RocksDB state store.</li>
+      <li><strong>Single-broker Kafka.</strong> Σε production setting θα χρησιμοποιούνταν cluster Kafka με replication factor τουλάχιστον 3.</li>
+    </ul>
+
+    <h3>9.4 Μελλοντικές επεκτάσεις</h3>
+    <ol>
+      <li>Σύνδεση με live odds API (π.χ. The Odds API) για αξιολόγηση σε πραγματικό streaming φορτίο.</li>
+      <li>Εκτέλεση σε multi-broker Kafka και multi-node Spark cluster για αξιολόγηση scalability.</li>
+      <li>Αντικατάσταση του driver-side state με Spark <code>mapGroupsWithState</code> και RocksDB state store για υποστήριξη checkpointing και fault tolerance.</li>
+      <li>Αξιολόγηση πιο επιθετικών configurations: trigger 50 ms στον Stream, μικρότερα windows στον Batch.</li>
+      <li>Επέκταση σε επιπλέον αγορές (over/under goals, both teams to score), όπου η λογική arbitrage είναι αναλογικά εφαρμόσιμη.</li>
+    </ol>
+
+    <hr class="divider">
+
+    <h3>Αναφορές</h3>
+    <ul>
+      <li>Apache Kafka Documentation — <a href="https://kafka.apache.org/documentation/">kafka.apache.org</a></li>
+      <li>Apache Spark Structured Streaming Programming Guide — <a href="https://spark.apache.org/docs/3.5.3/structured-streaming-programming-guide.html">spark.apache.org</a></li>
+      <li>football-data.co.uk — <a href="https://www.football-data.co.uk/data.php">football-data.co.uk/data.php</a></li>
+      <li>Διαλέξεις του μαθήματος "Πλατφόρμες και Αρχιτεκτονικές Νέφους", Γ. Δημητρακόπουλος &amp; Α. Καναβός, Ιόνιο Πανεπιστήμιο.</li>
+      <li><em>Learning Spark, 2nd Edition</em> (από τους πόρους του μαθήματος).</li>
+    </ul>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <p>Πηγαίος κώδικας και τεκμηρίωση: <code>arbitrage-streaming/</code></p>
+  <p>Ιόνιο Πανεπιστήμιο · Ιούνιος 2026</p>
+</footer>
+
+</body>
+</html>
